@@ -87,12 +87,10 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
-
         $validator = $this->validator($request->all());
 
         //Log::debug($validator->errors()->all());
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()->all()]);
         }
 
@@ -107,8 +105,7 @@ class RegisterController extends Controller
         ]);
         //Генерируем ссылку и отправляем письмо на указанный адрес
         $url = url('/').'/activate/'.$code;
-        Mail::send('auth.activation.registration', array('url' => $url), function($message) use ($request)
-        {
+        Mail::send('auth.activation.registration', array('url' => $url), function ($message) use ($request) {
             $message->to($request->email)
                 ->subject('User Registration')
                 ->from('apkens93@gmail.com', 'Test Sender');
@@ -120,20 +117,18 @@ class RegisterController extends Controller
         ]);
     }
 
-    public function activate($code){
-        $check = Activation::where('code',$code)->first();
-        if(!is_null($check)){
+    public function activate($code)
+    {
+        $check = Activation::where('code', $code)->first();
+        if (!is_null($check)) {
             $user = User::find($check->user_id);
-            if ($user->activated == 1){
-                return redirect()->to('login')->with('success',"user are already actived.");
-
+            if ($user->activated == 1) {
+                return redirect()->to('login')->with('success', "user are already actived.");
             }
             $user->update(['activated' => 1]);
-            Activation::where('code',$code)->delete();
-            return redirect()->to('login')->with('success',"user active successfully.");
+            Activation::where('code', $code)->delete();
+            return redirect()->to('login')->with('success', "user active successfully.");
         }
-        return redirect()->to('login')->with('Warning',"your token is invalid");
+        return redirect()->to('login')->with('Warning', "your token is invalid");
     }
-
-
 }

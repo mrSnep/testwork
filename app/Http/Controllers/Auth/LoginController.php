@@ -71,10 +71,4 @@ class LoginController extends Controller
             'location' => url($this->redirectTo)
         ]);
     }
-
-
-
-
-
-
 }

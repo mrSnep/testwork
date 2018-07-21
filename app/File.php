@@ -30,23 +30,23 @@ class File extends Model
      */
     public function smalldescription()
     {
-        return self::desctrunk(strip_tags($this->description),17);
+        return self::desctrunk(strip_tags($this->description), 17);
     }
 
     public function getType()
     {
         $types = array('<i class="glyphicon glyphicon-font"></i>','<i class="glyphicon glyphicon-picture"></i>','<i class="glyphicon glyphicon-compressed"></i>');
         return $types[$this->type];
-
     }
 
-    private static function desctrunk($string, $your_desired_width) {
+    private static function desctrunk($string, $your_desired_width)
+    {
         $text = substr($string, 0, $your_desired_width);
         $text = rtrim($text, "!,.-");
-        if(strlen($text)>1) $text .="...";
+        if (strlen($text)>1) {
+            $text .="...";
+        }
 
         return $text;
     }
-
-
 }

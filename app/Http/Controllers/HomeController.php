@@ -12,7 +12,6 @@ use Yajra\DataTables\DataTables;
 
 class HomeController extends Controller
 {
-
     private $text_ext = [ 'doc', 'docx', 'xls', 'xlsx', 'pdf'];
     private $pic_ext = ['jpg', 'png', ];
     private $archive_ext = ['rar', 'zip'];
@@ -33,7 +32,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-
         return view('files');
     }
 
@@ -50,7 +48,7 @@ class HomeController extends Controller
      */
     public function edit($id)
     {
-        return  File::where('id',$id)->where('user_id',Auth::user()->id)->firstOrFail();
+        return  File::where('id', $id)->where('user_id', Auth::user()->id)->firstOrFail();
     }
 
 
@@ -62,14 +60,12 @@ class HomeController extends Controller
      */
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'title' => 'nullable|alpha_dash|max:40',
             'file' => 'required|file|mimes:doc,docx,xls,xlsx,pdf,jpeg,png,rar,zip|max:200000'
         ]);
 
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
 
             //Log::debug($validator->errors()->all());
             return response()->json([
@@ -113,8 +109,7 @@ class HomeController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-        $file = File::where('id',$id)->where('user_id',Auth::user()->id)->firstOrFail();
+        $file = File::where('id', $id)->where('user_id', Auth::user()->id)->firstOrFail();
         $file->update($request->all());
         return response()->json([
             'success' => true,
@@ -133,7 +128,7 @@ class HomeController extends Controller
     {
         $file = File::findOrFail($id);
 
-        if ($file->user_id != Auth::id()){
+        if ($file->user_id != Auth::id()) {
             return response()->json([
                 'error' => true,
                 'message' => 'You don\'t have premission',
@@ -155,19 +150,21 @@ class HomeController extends Controller
      */
     public function apiFiles()
     {
-        $file = File::where('user_id',Auth::id())->get();
+        $file = File::where('user_id', Auth::id())->get();
         $start = 0;
 
         return Datatables::of($file)
-            ->addColumn('action', function($file){
+            ->addColumn('action', function ($file) {
                 return '<a href="'.url('/').'/download/'.$file->id.'" onclick="reloadTable()" class="btn btn-success btn-xs"><i class="glyphicon glyphicon-download-alt"></i> Download</a> ' .
                     '<a onclick="editForm('. $file->id .')" class="btn btn-primary btn-xs"><i class="glyphicon glyphicon-edit"></i> Edit</a> ' .
                     '<a onclick="deleteFile('. $file->id .')" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-trash"></i> Delete</a>';
             })
-            ->addColumn('smalldescription',function ($file){
+            ->addColumn('smalldescription', function ($file) {
                 return '<a href="#" onclick="getFullDescription('.$file->id.'); return false">'.$file->smalldescription().'</a>';
             })
-            ->addColumn('type_file', function ($file){ return $file->getType();  })
+            ->addColumn('type_file', function ($file) {
+                return $file->getType();
+            })
             ->addIndexColumn()
             ->removeColumn('type')
             ->removeColumn('description')
@@ -183,17 +180,17 @@ class HomeController extends Controller
      */
     public function download($id)
     {
-        $file = File::where('id',$id)->where('user_id',Auth::id())->firstOrFail();
+        $file = File::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
-        if(Storage::exists('/files/' . Auth::id() . '/'.$file->filename)) {
+        if (Storage::exists('/files/' . Auth::id() . '/'.$file->filename)) {
             $ext = pathinfo(storage_path().'/files/' . Auth::id() . '/'.$file->filename, PATHINFO_EXTENSION);
             $down = (int)$file->downloaded;
             $file->downloaded = $down+1;
             $file->save();
             return Storage::download('/files/' . Auth::id() . '/' . $file->filename, $file->title.'.'.$ext);
+        } else {
+            return redirect('file');
         }
-        else { return redirect('file');}
-
     }
     /**
      * Show full description from file
@@ -202,10 +199,9 @@ class HomeController extends Controller
      */
     public function fullDescription($file)
     {
-        $desc = File::where('id',$file)->where('user_id',Auth::id())->firstOrFail()->fulldescription();
+        $desc = File::where('id', $file)->where('user_id', Auth::id())->firstOrFail()->fulldescription();
 
         return $desc;
-
     }
 
     /**
@@ -215,7 +211,6 @@ class HomeController extends Controller
      */
     private function getType($ext)
     {
-
         if (in_array($ext, $this->archive_ext)) {
             return 3;
         }
@@ -227,9 +222,6 @@ class HomeController extends Controller
         if (in_array($ext, $this->text_ext)) {
             return 1;
         }
-
-
-
     }
 
     /**
@@ -258,7 +250,8 @@ class HomeController extends Controller
      * @param  string $filename
      * @return string
      */
-    private function translit($str){
+    private function translit($str)
+    {
         $alphavit = array(
             /*--*/
             "а"=>"a","б"=>"b","в"=>"v","г"=>"g","д"=>"d","е"=>"e",
